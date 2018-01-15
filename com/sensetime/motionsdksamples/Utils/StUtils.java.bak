@@ -1,0 +1,128 @@
+package com.sensetime.motionsdksamples.Utils;
+
+import com.sensetime.motion.Body;
+import com.sensetime.motion.Fingertip;
+import com.sensetime.motion.Hand;
+
+/**
+ * Created by sensetime on 17-7-5.
+ */
+
+public class StUtils {
+    /**
+     * rotate the handinfo in the image
+     *
+     * @param handinfo
+     * @param width,
+     *            origin width in the image
+     * @param height,
+     *            origin height in the image
+     * @return rotated handinfo
+     */
+    static public Hand rotateDeg90(Hand handinfo, int width, int height) {
+        int left = handinfo.getLeft();
+        int newleft = height - handinfo.getBottom();
+        int newbottom = handinfo.getRight();
+        int newright = height - handinfo.getTop();
+        int newtop = left;
+        return new Hand(newleft, newtop, newright, newbottom, handinfo.getType());
+    }
+
+    static public Hand rotateDeg270(Hand handinfo, int width, int height) {
+        int left = handinfo.getLeft();
+        int newleft = handinfo.getTop();
+        int newtop = width - handinfo.getRight();
+        int newright = handinfo.getBottom();
+        int newbottom = width - left;
+        return new Hand(newleft, newtop, newright, newbottom, handinfo.getType());
+    }
+
+    static public Hand rotateDeg180(Hand handinfo, int width, int height) {
+        int newleft = width - handinfo.getRight();
+        int newtop = height - handinfo.getTop();
+        int newright = width - handinfo.getLeft();
+        int newbottom = height - handinfo.getBottom();
+        return new Hand(newleft, newtop, newright, newbottom, handinfo.getType());
+    }
+
+    /**
+     * rotate the finger in the image
+     *
+     * @param fingerinfo
+     * @param width,
+     *            origin width in the image
+     * @param height,
+     *            origin height in the image
+     * @return rotated fingerinfo
+     */
+    static public Fingertip rotateDeg90(Fingertip fingerinfo, int width, int height) {
+        int left = fingerinfo.getLeft();
+        int newleft = height - fingerinfo.getBottom();
+        int newbottom = fingerinfo.getRight();
+        int newright = height - fingerinfo.getTop();
+        int newtop = left;
+        int x = fingerinfo.getPointX();
+        int newx = height - fingerinfo.getPointY();
+        int newy = x;
+        return new Fingertip(fingerinfo.isValid(),newleft, newtop, newright, newbottom, newx,newy);
+    }
+
+    static public Fingertip rotateDeg270(Fingertip fingerinfo, int width, int height) {
+        int left = fingerinfo.getLeft();
+        int newleft = fingerinfo.getTop();
+        int newtop = width - fingerinfo.getRight();
+        int newright = fingerinfo.getBottom();
+        int newbottom = width - left;
+        int x = fingerinfo.getPointX();
+        int newx = fingerinfo.getPointY();
+        int newy = width - x;
+        return new Fingertip(fingerinfo.isValid(),newleft, newtop, newright, newbottom, newx, newy);
+    }
+
+    static public Fingertip rotateDeg180(Fingertip fingerinfo, int width, int height) {
+        int newleft = width - fingerinfo.getRight();
+        int newtop = height - fingerinfo.getTop();
+        int newright = width - fingerinfo.getLeft();
+        int newbottom = height - fingerinfo.getBottom();
+        int x = fingerinfo.getPointX();
+        int newx = width-fingerinfo.getPointX();
+        int newy = height - fingerinfo.getPointY();
+        return new Fingertip(fingerinfo.isValid(),newleft, newtop, newright, newbottom, newx,newy);
+    }
+
+    /**
+     * rotate the Body info in the image
+     *
+     * @param bodyinfo
+     * @param width,
+     *            origin width in the image
+     * @param height,
+     *            origin height in the image
+     * @return rotated Body points
+     */
+    static public float[] rotateDeg90(Body bodyinfo, int width, int height) {
+        float[] newBodyPoints = new float[Body.POINTS_COUNT*2];
+        float[] bodyPoints = bodyinfo.getKeypoints();
+        for(int i = 0; i < Body.POINTS_COUNT; i++) {
+            float newx = bodyPoints[2*i+1];
+            float newy = width - bodyPoints[2*i];
+            newBodyPoints[2*i] = newx;
+            newBodyPoints[2*i+1] = newy;
+        }
+
+        return newBodyPoints;
+    }
+
+    static public float[] rotateDeg270(Body bodyinfo, int width, int height) {
+        float[] newBodyPoints = new float[Body.POINTS_COUNT*2];
+        float[] bodyPoints = bodyinfo.getKeypoints();
+        for(int i = 0; i < Body.POINTS_COUNT; i++) {
+            float newx = height - bodyPoints[2*i+1];
+            float newy = bodyPoints[2*i];
+            newBodyPoints[2*i] = newx;
+            newBodyPoints[2*i+1] = newy;
+        }
+
+        return newBodyPoints;
+    }
+}

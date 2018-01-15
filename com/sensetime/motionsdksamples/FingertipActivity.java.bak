@@ -1,0 +1,149 @@
+package com.sensetime.motionsdksamples;
+
+
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.Rect;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import com.sensetime.motion.Fingertip;
+import com.sensetime.motion.FingertipTracker;
+import com.sensetime.motion.PixelFormat;
+import com.sensetime.motion.StMotionException;
+import com.sensetime.motionsdksamples.Common.BaseCameraFragment;
+import com.sensetime.motionsdksamples.Utils.StUtils;
+
+import java.io.File;
+import java.io.IOException;
+
+public class FingertipActivity extends BaseCameraFragment {
+
+    private static final String TAG = FingertipActivity.class.getSimpleName();
+
+    private FingertipTracker mTracker = null;
+
+    private Fingertip mFingertip = new Fingertip();
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        try {
+            // Copy model from assets to internal storage
+            String modelName = "Fingertip_Track.model";
+            mModelPath = getActivity().getFilesDir().getAbsolutePath() + File.separator + modelName;
+            copyModelInAssets(modelName, mModelPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+            //showDialog("Fail to Copy Model", e.getMessage());
+        }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mTracker == null) {
+            try {
+                mTracker = new FingertipTracker(mModelPath);
+            } catch (StMotionException e) {
+                e.printStackTrace();
+                //showDialog("Fail to Create Fingertip Tracker", e.getMessage());
+            }
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mTracker != null) {
+            mTracker.release();
+            mTracker = null;
+        }
+    }
+
+    @Override
+    protected void onPreviewFrame(byte[] data) {
+        if (mTracker != null) {
+            // The camera's preview format is set to ImageFormat.NV21,
+            // the data shall be nv21 format, so we pass PixelFormat.NV21 here
+            try {
+                int orientation = getMotionOrientation();
+                mTracker.track(data, PixelFormat.NV21, CAMERA_PREVIEW_WIDTH,
+                        CAMERA_PREVIEW_HEIGHT, orientation, mFingertip);
+
+                Canvas canvas = mOverlapSurfaceView.getHolder().lockCanvas();
+                // Clear the canvas
+                canvas.drawColor(0, PorterDuff.Mode.CLEAR);
+
+                if (mFingertip.isValid()) {
+                    // Detected fingertip in this frame, let's draw it on the canvas
+                    drawFingertip(canvas);
+                    /*
+                    mtextViewInfo.setText(String.format("rect: (%d, %d, %d, %d)\npoint: (%d, %d)",
+                            mFingertip.getLeft(), mFingertip.getTop(),
+                            mFingertip.getRight(), mFingertip.getBottom(),
+                            mFingertip.getPointX(), mFingertip.getPointY()));
+                    */
+                    Log.i(TAG, "mFingertip: " + mFingertip);
+                } else {
+                    //mtextViewInfo.setText("No Fingertip detected");
+                }
+
+                mOverlapSurfaceView.getHolder().unlockCanvasAndPost(canvas);
+            } catch (StMotionException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void drawFingertip(Canvas canvas) {
+        if(canvas == null) {
+            return;
+        }
+        canvas.setMatrix(mMatrix);
+        int rotate = getRotate();
+        Fingertip fingerInfo;
+        if(rotate == 90) {
+            fingerInfo = StUtils.rotateDeg90(mFingertip,CAMERA_PREVIEW_WIDTH,CAMERA_PREVIEW_HEIGHT);
+        }else if(rotate == 270) {
+            fingerInfo = StUtils.rotateDeg270(mFingertip,CAMERA_PREVIEW_WIDTH,CAMERA_PREVIEW_HEIGHT);
+        }else if(rotate == 180){
+            fingerInfo = StUtils.rotateDeg180(mFingertip,CAMERA_PREVIEW_WIDTH,CAMERA_PREVIEW_HEIGHT);
+        }else{
+            fingerInfo = mFingertip;
+        }
+
+        // The preview for frontal camera is mirrored image
+        int left = CAMERA_PREVIEW_WIDTH - fingerInfo.getRight();
+        int top = fingerInfo.getTop();
+        int right = CAMERA_PREVIEW_WIDTH - fingerInfo.getLeft();
+        int bottom = fingerInfo.getBottom();
+        int x = CAMERA_PREVIEW_WIDTH - fingerInfo.getPointX();
+        int y = fingerInfo.getPointY();
+
+        //draw
+        Paint paint = new Paint();
+        paint.setColor(Color.rgb(57, 138, 243));
+        int strokeWidth = Math.max(CAMERA_PREVIEW_WIDTH / 240, 4);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(strokeWidth);
+        // Draw rectangle of detected hand on the canvas
+        Rect rect = new Rect(left, top, right, bottom);
+        canvas.drawRect(rect, paint);
+        // Draw Point of detected Fingertip on the canvas
+        paint.setColor(Color.RED);
+        paint.setStyle(Paint.Style.FILL);
+        canvas.drawCircle(x, y, 10, paint);
+    }
+}
