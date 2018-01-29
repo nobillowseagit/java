@@ -74,7 +74,7 @@ public class FaceServer implements IFace {
     public void setCurrentPerson(Person person) {
         mTimer.start();
         _setCurrentPerson(person);
-        mDialogServer.enterVisionTriggerSync();
+        //mDialogServer.enterVisionTriggerSync();
         /*
         if (PERSON_NOT_SIMILAR == mCurrentPerson.similar(person))
         {

@@ -24,6 +24,7 @@ import com.sensetime.motionsdksamples.Photography.Photo;
 import com.sensetime.motionsdksamples.R;
 import com.sensetime.motionsdksamples.Utils.Accelerometer;
 import com.sensetime.motionsdksamples.Utils.UniqueId;
+import com.socks.library.KLog;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,6 +40,8 @@ public abstract class BaseCameraFragment extends Fragment {
     protected static final int CAMERA_PREVIEW_HEIGHT = 720;
     protected static final int CAMERA_PICTURE_HEIGHT = 2448;
     protected static final int CAMERA_PICTURE_WIDTH = 3264;
+    protected static final int CAMERA_PREVIEW_FPS = 10;
+    private static final int CAMERA_ORIENTATION = 0;
 
     private static final String TAG = BaseCameraFragment.class.getSimpleName();
 
@@ -56,8 +59,11 @@ public abstract class BaseCameraFragment extends Fragment {
     private boolean mSurfaceCreated = false;
 
     View mView;
+
     private Photo mPhoto;
+
     private int mShotMode = 2;
+    private Camera.Parameters mParameter;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -225,9 +231,11 @@ public abstract class BaseCameraFragment extends Fragment {
             List<Camera.Size> previewSizes = mCamera.getParameters().getSupportedPreviewSizes();
 
             Camera.Parameters parameters = mCamera.getParameters();
+            mParameter = parameters;
             parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
             parameters.setPreviewFormat(ImageFormat.NV21);
             parameters.setPreviewSize(CAMERA_PREVIEW_WIDTH, CAMERA_PREVIEW_HEIGHT);
+            //parameters.setPreviewFpsRange(CAMERA_PREVIEW_FPS, CAMERA_PREVIEW_FPS);
 
             //picture
             parameters.setPictureSize(CAMERA_PICTURE_WIDTH, CAMERA_PICTURE_HEIGHT);
@@ -434,7 +442,7 @@ public abstract class BaseCameraFragment extends Fragment {
             final Bitmap bitmap = Bitmap.createBitmap(resource, 0, 0, resource.getWidth(), resource.getHeight(), matrix, true);
 
             //mPhoto.setBitmap(bitmap);
-            //mPhoto.process();
+            //mPhoto.process();***
 
             if (2 == mShotMode) {
                 mPhoto.setBitmap2(bitmap);

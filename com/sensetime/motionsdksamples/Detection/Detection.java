@@ -16,6 +16,7 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -60,6 +61,40 @@ public class Detection {
         //File file = new File(Environment.getExternalStorageDirectory() + "/Download/image1.jpg");
         File file = new File("/sdcard/Download/" + "image1.jpg");
 
+        OkHttpClient okHttpClient = new OkHttpClient();
+
+        MultipartBody.Builder builder = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("img", "image1.jpg",
+                        RequestBody.create(MediaType.parse("image/png"), file));
+
+        MultipartBody requestBody = builder.build();
+
+        String strUrl = "http://" + mConfig.mServerIp + ":" + mConfig.mServerPort + "/upload";
+
+        Request request = new Request.Builder()
+                .url(strUrl)
+                .post(requestBody)
+                .build();
+
+        Call call = okHttpClient.newCall(request);
+
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                upload_complete = true;
+            }
+        });
+    }
+
+    public synchronized void httpsUploadImage() {
+        //File file = new File(Environment.getExternalStorageDirectory() + "/Download/image1.jpg");
+        File file = new File("/sdcard/Download/" + "image1.jpg");
+
         MultipartBody.Builder builder = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("img", "image1.jpg",
@@ -89,6 +124,46 @@ public class Detection {
     }
 
     public synchronized void getRes() {
+        String urlString = "http://" + mConfig.mServerIp + ":" + mConfig.mServerPort + "/image_get_res";
+
+        OkHttpClient okHttpClient = new OkHttpClient();
+
+        Request request = new Request.Builder()
+                .url(urlString)
+                .build();
+
+        Call call = okHttpClient.newCall(request);
+
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                mSpeechServer.reqSingleTts("不认识");
+                mDialogServer.exitPauseSync();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String obj = response.body().string();
+                obj.trim();
+                KLog.v(obj);
+                if (!obj.equals("0")) {
+                    reg_complete = true;
+                    mRes = obj;
+                    /*
+                    mSpeechServer.reqSingleTts(obj);
+                    try {
+                        sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    */
+                    //mDialogServer.exitPauseSync();
+                }
+            }
+        });
+    }
+
+    public synchronized void httpsGetRes() {
         String urlString = "https://" + mConfig.mServerIp + ":" + mConfig.mServerPort + "/image_get_res";
         Request request = new Request.Builder()
                 //.url("https://192.168.50.65:8888/get_data?question="+question)

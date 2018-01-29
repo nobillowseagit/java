@@ -167,6 +167,9 @@ public class RemoteServer extends ServerThread implements IRemote {
 
                     mCurrentPerson = person;
 
+                    mFaceServer.setFaceAttr(faceAttr);
+                    mFaceServer.setCurrentPerson(person);
+
                     /*
                     DialogContext context = new DialogContext();
                     context.domain = new Domain(DOMAIN_DEFAULT);
@@ -194,6 +197,11 @@ public class RemoteServer extends ServerThread implements IRemote {
                 string = query.getString("server_ip");
                 if (string != null) {
                     mConfig.mServerIp = string;
+                }
+
+                string = query.getString("camera_enable");
+                if (string != null) {
+                    mConfig.mCameraEnable = string;
                 }
 
                 string = query.getString("guess");
@@ -426,6 +434,21 @@ public class RemoteServer extends ServerThread implements IRemote {
                 string = query.getString("turn_left");
                 if (string != null) {
                     mMotionServer.turnLeft();
+                }
+
+                string = query.getString("turn2_left");
+                if (string != null) {
+                    mMotionServer.turn2Left();
+                }
+
+                string = query.getString("turn3_left");
+                if (string != null) {
+                    mMotionServer.turn3Left(Integer.valueOf(string));
+                }
+
+                string = query.getString("turn3_right");
+                if (string != null) {
+                    mMotionServer.turn3Right(Integer.valueOf(string));
                 }
 
                 string = query.getString("turn_right");

@@ -112,6 +112,31 @@ public class MotionServer implements IMotion {
         mDecimalConversionUtils.setSplicingParameterHead("01", "00", 10);
     }
 
+    public void turn2Left() {
+        stopMotion();
+        mDecimalConversionUtils.setSplicingParameterHead("02", "00", 10);
+    }
+
+    public void turn3Left() {
+        stopMotion();
+        mDecimalConversionUtils.setSplicingParameterHead("03", "00", 10);
+    }
+
+    public void turn3Right() {
+        stopMotion();
+        mDecimalConversionUtils.setSplicingParameterHead("03", "01", 10);
+    }
+
+    public void turn3Left(int degree) {
+        stopMotion();
+        mDecimalConversionUtils.setSplicingParameterHead("03", "00", degree);
+    }
+
+    public void turn3Right(int degree) {
+        stopMotion();
+        mDecimalConversionUtils.setSplicingParameterHead("03", "01", degree);
+    }
+
     public void turnRight() {
         stopMotion();
         mDecimalConversionUtils.setSplicingParameterHead("01", "00", 10);

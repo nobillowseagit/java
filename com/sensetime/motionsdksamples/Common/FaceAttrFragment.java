@@ -34,6 +34,7 @@ import com.sensetime.motionsdksamples.EventBusUtils.ServerThread;
 import com.sensetime.motionsdksamples.R;
 import com.sensetime.motionsdksamples.UiMsg;
 import com.sensetime.motionsdksamples.Utils.BitmapUtil;
+import com.sensetime.motionsdksamples.Utils.Config;
 import com.sensetime.motionsdksamples.Utils.FileUtils;
 import com.sensetime.motionsdksamples.Utils.ObjectUtils;
 import com.sensetime.motionsdksamples.Utils.UniqueId;
@@ -62,9 +63,11 @@ public class FaceAttrFragment extends BaseCameraFragment implements BitmapUtil.P
     private static final int FACE_ATTR_NOT_SIMILAR = 0;
     private static final int MSG_TIME_OUT = 1;
     private static final int FACE_TIME_OUT = 30000;
+    private int FACE_ORIENTAION = StFaceOrientation.ST_FACE_UP;
     public static final String ATTR_MODEL_NAME = "attribute.model";
     public static final String VERIFY_MODEL_NAME = "verify.model";
 
+    private Config mConfig;
     private StFaceAttribute mStFaceAttribute = null;
     private StFaceTrack mFaceAttrTracker = null;
     private StFaceVerify mVerify = null;
@@ -96,7 +99,6 @@ public class FaceAttrFragment extends BaseCameraFragment implements BitmapUtil.P
 
     private boolean mProcessCompleted;
 
-
     public enum FaceMode {
         FACE_MODE_NO, FACE_MODE_ATTR, FACE_MODE_VERIFY
     }
@@ -108,6 +110,10 @@ public class FaceAttrFragment extends BaseCameraFragment implements BitmapUtil.P
     //private EditText mETRes;
     //private InfoServer mInfoServer;
     //private int mMode;
+
+    public void setConfig(Config config) {
+        mConfig = config;
+    }
 
     @Override
     public void onLicenseInitSuccess() {
@@ -797,11 +803,13 @@ public class FaceAttrFragment extends BaseCameraFragment implements BitmapUtil.P
 
     @Override
     protected void onPreviewFrame(byte[] data) {
-        if (mProcessCompleted) {
-            setProcessCompleted(false);
-            mProcessServer = new ProcessServer();
-            mProcessServer.setData(data);
-            mProcessServer.start();
+        if (mConfig.mCameraEnable.equals("enable")) {
+            if (mProcessCompleted) {
+                setProcessCompleted(false);
+                mProcessServer = new ProcessServer();
+                mProcessServer.setData(data);
+                mProcessServer.start();
+            }
         }
     }
 
@@ -936,4 +944,5 @@ public class FaceAttrFragment extends BaseCameraFragment implements BitmapUtil.P
             return null;
         }
     }
+
 }

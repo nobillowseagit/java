@@ -35,6 +35,7 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -176,7 +177,8 @@ public class NlgServer extends ServerThread implements INlg {
             question += ".";
         }
 
-        getHttpsHtml(question);
+        //getHttpsHtml(question);
+        getHttpHtml(question);
 
         synchronized (mLock) {
             while (mResString == null && cnt < 5) {
@@ -378,6 +380,51 @@ public class NlgServer extends ServerThread implements INlg {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 //System.out.println("--------------onResponse--------------" + response.body().string());
+                mResString = response.body().string();
+
+                UiMsg uiMsg = new UiMsg();
+                uiMsg.cmd = UiMsg.UI_CMD.UI_CMD_THINKED;
+                EventBus.getDefault().post(uiMsg);
+
+                KLog.i("lijia " + mResString);
+                if (null != mResString) {
+                    handleRes2(mResString);
+                }
+            }
+        });
+    }
+
+    private void getHttpHtml(String question) {
+        mResString = null;
+        String urlString;
+        urlString = "http://" + mConfig.mServerIp + ":" + mConfig.mServerPort + "/get_data?question=" + question;
+        KLog.i("lijia " + urlString);
+
+        OkHttpClient okHttpClient = new OkHttpClient();
+
+        Request request = new Request.Builder()
+                .url(urlString)
+                .build();
+
+        Call call = okHttpClient.newCall(request);
+
+        /*
+        try {
+            Response response = call.execute();
+            System.out.println(response.body().string());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        */
+
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                KLog.d("lijia");
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
                 mResString = response.body().string();
 
                 UiMsg uiMsg = new UiMsg();

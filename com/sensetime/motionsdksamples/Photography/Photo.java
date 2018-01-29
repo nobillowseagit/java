@@ -54,7 +54,10 @@ public class Photo extends ServerThread {
     String pathC;
     int slot;
     private Stitch stitch;
-    FaceAttrFragment mFaceAttrFragment;
+
+    private FaceAttrFragment mFaceAttrFragment;
+    private Handler mCameraHandler;
+
     MotionServer mMotionServer;
 
     boolean mFullStarted;
@@ -90,7 +93,8 @@ public class Photo extends ServerThread {
 
     public void init(FaceAttrFragment faceAttrFragment) {
         mFaceAttrFragment = faceAttrFragment;
-    }
+        mCameraHandler = mFaceAttrFragment.getHandler();
+    };
 
     public void setPhotoCompletedCallback(PhotoCompletedCallback callback) {
         mFullCompletedCallback = callback;
@@ -256,10 +260,10 @@ public class Photo extends ServerThread {
     public synchronized void takePicA() {
         KLog.i("lijia shotting");
         mSpeechServer.reqSingleTts("正在拍摄中");
-        FaceAttrFragment.MyHandler handler = mFaceAttrFragment.getHandler();
+        //FaceAttrFragment.MyHandler handler = mFaceAttrFragment.getHandler();
         Message msg = new Message();
         msg.what = 2;
-        handler.sendMessage(msg);
+        mCameraHandler.sendMessage(msg);
     }
 
     public void shot() {

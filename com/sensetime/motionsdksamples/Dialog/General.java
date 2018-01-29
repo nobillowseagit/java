@@ -4,6 +4,7 @@ import com.sensetime.motionsdksamples.Common.FaceAttr;
 import com.sensetime.motionsdksamples.Common.FaceProxy;
 import com.sensetime.motionsdksamples.Common.FaceServer;
 import com.sensetime.motionsdksamples.Common.Person;
+import com.sensetime.motionsdksamples.UiMsg;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -22,10 +23,14 @@ public class General extends Domain {
         return instance;
     }
 
+    private DialogServer mDialogServer;
+
     public General() {
         super(DOMAIN_GENEREL);
         DomainOperation operation = new DefaultOperation();
         setDomainOperation(operation);
+
+        mDialogServer = DialogServer.getInstance();
     }
 
     public void start(DialogContext context) {
@@ -78,6 +83,15 @@ public class General extends Domain {
     }
 
     public void nlg(DialogContext context) {
+
+        if (null != context.nlgActCmdStr) {
+            switch (context.nlgActCmdStr) {
+                case "复位":
+                    mDialogServer.reset();
+                    break;
+            }
+        }
+
         context.ttsReqStr = context.nlgResStr;
 
         DialogMsg msg = new DialogMsg();

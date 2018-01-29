@@ -23,6 +23,8 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -59,11 +61,13 @@ import com.sensetime.motionsdksamples.frameAnimation.FrameAnimationUtils;
 import java.io.File;
 
 import com.sensetime.motionsdksamples.Speech.AISpeech.service.AISpeechService;
+import com.socks.library.KLog;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import static android.view.KeyEvent.ACTION_DOWN;
 import static com.sensetime.motionsdksamples.EventBusUtils.MsgBase.MSG_TYPE.MSG_TYPE_UI;
 
 public class MainActivity extends Activity implements BitmapUtil.PrepareLicenseAsyncTask.LicenseResultListener, View.OnClickListener {
@@ -304,6 +308,7 @@ public class MainActivity extends Activity implements BitmapUtil.PrepareLicenseA
         //f5 = new FaceAttrFragment();
         //transaction.replace(R.id.fl_content, f5);
         mFaceAttrFragment = new FaceAttrFragment();
+        mFaceAttrFragment.setConfig(mConfig);
         transaction.replace(R.id.fl_content, mFaceAttrFragment);
         transaction.commit();
 
@@ -429,9 +434,11 @@ public class MainActivity extends Activity implements BitmapUtil.PrepareLicenseA
 
     @Override
     public void onLicenseInitFailed(String errorMessage) {
+        KLog.debug("lijia face license init Failed");
     }
 
     public void onLicenseInitSuccess() {
+        KLog.debug("lijia face license init Ok");
     };
 
     public EditText getETInfo() {
@@ -449,7 +456,8 @@ public class MainActivity extends Activity implements BitmapUtil.PrepareLicenseA
     public void initConfig() {
         String path = null;
         path = Environment.getExternalStorageDirectory().getPath() + File.separator + "lijia1";
-        mConfig = new Config(this, path);
+        //mConfig = new Config(this, path);
+        mConfig = new Config();
     }
 
     public Config getConfig() {
@@ -478,7 +486,7 @@ public class MainActivity extends Activity implements BitmapUtil.PrepareLicenseA
         mFaceServer = FaceServer.getInstance();
 
         mMotionServer = MotionServer.getInstance();
-        mMotionServer.setMotorType(2);  //1: smartshow, 2:smartagent
+        mMotionServer.setMotorType(1);  //1: smartshow, 2:smartagent
 
         mDialogServer = DialogServer.getInstance();
 
@@ -764,5 +772,29 @@ public class MainActivity extends Activity implements BitmapUtil.PrepareLicenseA
                 break;
         }
         return super.onTouchEvent(event);
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        int key = event.getKeyCode();
+        int action = event.getAction();
+        Log.i(TAG, "key=" + "," + key + "action=" + action);
+
+        if (ACTION_DOWN == action) {
+            switch (key) {
+                case 314:
+                    speak();
+                    break;
+                case 315:
+                    hug();
+                    break;
+                case 316:
+                    kiss();
+                    break;
+                default:
+            }
+        }
+
+        return super.dispatchKeyEvent(event);
     }
 }

@@ -487,4 +487,10 @@ public class DialogServer extends ServerThread implements IDialog{
         DialogContext context = getCurrentContext();
         handleTtsRes(context);
     }
+
+    public synchronized void reset() {
+        DialogContext context = getCurrentContext();
+        context.setDomain(General.getInstance());
+        setCurrentContext(context);
+    }
 }

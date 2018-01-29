@@ -15,9 +15,23 @@ import java.util.Properties;
 public class Config {
     //private static final String CONFIG_FILE = "/";
     private Properties mProperties;
-    public String mServerIp;
-    public String mServerPort;
+    public String mServerIp = "192.168.50.62";
+    public String mServerPort = "8888";
+    public String mCameraEnable = "enable";
 
+    public void setServerIp(String ip) {
+        mServerIp = ip;
+    }
+
+    public void setServerPort(String port) {
+        mServerPort = port;
+    }
+
+    public void setCameraEnable(String flag) {
+        mCameraEnable = flag;
+    }
+
+    /*
     public static Properties loadConfig(Context context, String fullPath) {
         Properties properties = new Properties();
         try {
@@ -70,4 +84,5 @@ public class Config {
         mServerPort = (String)mProperties.get("ServerPort");
 
     }
+    */
 }

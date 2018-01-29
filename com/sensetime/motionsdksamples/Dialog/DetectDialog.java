@@ -35,7 +35,6 @@ import static java.lang.Thread.sleep;
 
 public class DetectDialog extends DialogBase {
     private static DetectDialog instance = new DetectDialog();
-
     public static DetectDialog getInstance() {
         return instance;
     }
